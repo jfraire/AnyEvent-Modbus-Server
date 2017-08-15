@@ -1,0 +1,28 @@
+AnyEvent::Modbus::Server version 0.01
+===================================
+
+This distribution proposes an asynchronous MODBUS server implementation in Perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- Device::Modbus version 0.022 or above
+- Device::Modbus::TCP version 0.026 or above
+- AnyEvent version 7.14
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Julio Fraire
+
+Please find the attached LICENSE file for the terms of this software package.
+

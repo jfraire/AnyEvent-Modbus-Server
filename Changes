@@ -1,0 +1,6 @@
+Revision history for Perl extension Device::Modbus::AnyEvent.
+
+0.01  Fri Feb 26 18:21:36 2016
+	- original version; created by h2xs 1.23 with options
+		-X Device::Modbus::AnyEvent
+
