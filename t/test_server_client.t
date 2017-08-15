@@ -23,8 +23,6 @@ unless (defined $pid && $pid) {
     
     my $server = AnyEvent::Modbus::TCP::Server->new(
         port              => 6545,
-        log_level         => 4,
-        log_file          => "/tmp/log$$",
     );
     $server->add_server_unit($unit);
     

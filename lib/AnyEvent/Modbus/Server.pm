@@ -14,6 +14,8 @@ use warnings;
 
 use parent('Device::Modbus::Server');
 
+our $VERSION = '0.01';
+
 # Called when there is a new request
 sub process_request {
     my ($self, $handle) = @_;
@@ -178,3 +180,22 @@ sub log {
 }
 
 1;
+
+=pod
+
+=head1 NAME
+
+AnyEvent::Modbus::Server - Asynchronous MODBUS server implementation
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head1 SEE ALSO
+
+=head1 LICENSE
+
+=cut
+
