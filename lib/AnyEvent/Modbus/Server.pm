@@ -14,7 +14,7 @@ use warnings;
 
 use parent('Device::Modbus::Server');
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Called when there is a new request
 sub process_request {

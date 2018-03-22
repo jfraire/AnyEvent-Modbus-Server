@@ -6,6 +6,7 @@ LICENSE
 Makefile.PL
 MANIFEST
 README
+t/lib/Test/AllRequests.pm
 t/lib/Test/Server.pm
 t/lib/Test/Simple.pm
 t/lib/Test/Unit.pm
@@ -13,4 +14,5 @@ t/parse_requests.t
 t/server.t
 t/server_exceptions.t
 t/simple_accessors.t
+t/test_async_server.t
 t/test_server_client.t
