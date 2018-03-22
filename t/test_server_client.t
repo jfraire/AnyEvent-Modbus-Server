@@ -3,7 +3,7 @@
 use lib 't/lib';
 use Device::Modbus::TCP::Client;
 use AnyEvent::Log;
-use Test::More tests => 13;
+use Test::More tests => 12;
 use strict;
 use warnings;
 
@@ -20,18 +20,18 @@ unless (defined $pid && $pid) {
     # Send an alarm signal in two seconds.
     alarm(2);
     my $unit   = Test::Unit->new( id => 3 );
-    
+
     my $server = AnyEvent::Modbus::TCP::Server->new(
         port              => 6545,
     );
     $server->add_server_unit($unit);
-    
+
     # Configure AE::Logging
     my $fname = "/tmp/test_server_$$";
 #    diag "Logging to $fname";
     $AnyEvent::Log::LOG->log_to_file($fname);
     $AnyEvent::Log::FILTER->level("trace");
-    
+
     # Just wait for the server to stop
     my $cv = AnyEvent->condvar;
     my $guard = $server->start;
@@ -43,7 +43,7 @@ unless (defined $pid && $pid) {
             $cv->send;
         }
     );
-    
+
     $cv->recv;
     exit 0;
 }
@@ -63,20 +63,14 @@ isa_ok $req, 'Device::Modbus::Request';
 
 sleep 1;
 
-eval {
-    $client->send_request($req);
-};
-ok !$@, 'Survived sending request to forked server';
+$client->send_request($req);
 
-SKIP : {
-    skip "Client just died($@)", 2 if $@;
-    
-    my $adu = $client->receive_response;
+my $adu = $client->receive_response;
 
-    isa_ok $adu, 'Device::Modbus::TCP::ADU';
-    is_deeply $adu->values, [6], 'Value returned from server is correct';
-    $client->disconnect;
-}
+isa_ok $adu, 'Device::Modbus::TCP::ADU';
+is_deeply $adu->values, [6], 'Value returned from server is correct';
+$client->disconnect;
+
 
 is wait(), $pid, "Waited for child whose pid was $pid" ;
 

@@ -38,6 +38,7 @@ sub process_request {
         # second reading.
         my $process_request = sub {
             my $handle = shift;
+
             $adu_req->message($request);
 
             # Process the request
@@ -85,21 +86,18 @@ sub process_request {
             }
             elsif ($code == 0x0F) {
                 # Write multiple coils
-                my ($address, $qty, $bytes) = unpack 'nnC', $_[1];
+                my ($address, $qty, $bytes, @values) = unpack 'nnCC*', $_[1];
                 my $bytes_qty = $qty % 8 ? int($qty/8) + 1 : $qty/8;
                 if ($bytes == $bytes_qty) {
-                    $_[0]->unshift_read( chunk => $bytes_qty, sub {
-                        my @values = unpack 'C*', $_[1];
-                        @values    = Device::Modbus->explode_bit_values(@values);
-
-                        $request = Device::Modbus::Request->new(
-                            code       => $code,
-                            address    => $address,
-                            quantity   => $qty,
-                            bytes      => $bytes,
-                            values     => \@values
-                        );
-                    });
+                    @values = Device::Modbus->explode_bit_values(@values);
+                    @values = splice @values, 0, $qty;
+                    $request = Device::Modbus::Request->new(
+                        code       => $code,
+                        address    => $address,
+                        quantity   => $qty,
+                        bytes      => $bytes,
+                        values     => \@values
+                    );
                 }
                 else {
                     $request = Device::Modbus::Exception->new(
@@ -110,19 +108,15 @@ sub process_request {
             }
             elsif ($code == 0x10) {
                 # Write multiple registers
-                my ($address, $qty, $bytes) = unpack 'nnC', $_[1];
+                my ($address, $qty, $bytes, @values) = unpack 'nnCn*', $_[1];
                 if ($bytes == 2 * $qty) {
-                    $_[0]->unshift_read(chunk => $bytes, sub {
-                        my (@values) = unpack 'n*', $_[1];
-
-                        $request = Device::Modbus::Request->new(
-                            code       => $code,
-                            address    => $address,
-                            quantity   => $qty,
-                            bytes      => $bytes,
-                            values     => \@values
-                        );
-                    });
+                    $request = Device::Modbus::Request->new(
+                        code       => $code,
+                        address    => $address,
+                        quantity   => $qty,
+                        bytes      => $bytes,
+                        values     => \@values
+                    );
                 }
                 else {
                     $request = Device::Modbus::Exception->new(
@@ -133,23 +127,19 @@ sub process_request {
             }
             elsif ($code == 0x17) {
                 # Read/Write multiple registers
-                my ($read_addr, $read_qty, $write_addr, $write_qty, $bytes)
-                    = unpack 'nnnnC', $_[1];
+                my ($read_addr, $read_qty, $write_addr, $write_qty,
+                    $bytes, @values) = unpack 'nnnnCn*', $_[1];
 
                 if ($bytes == 2 * $write_qty) {
-                    $_[0]->unshift_read( chunk => $bytes, sub {
-                        my (@values) = $self->parse_buffer($bytes, 'n*');
-
-                        $request = Device::Modbus::Request->new(
-                            code           => $code,
-                            read_address   => $read_addr,
-                            read_quantity  => $read_qty,
-                            write_address  => $write_addr,
-                            write_quantity => $write_qty,
-                            bytes          => $bytes,
-                            values         => \@values
-                        );
-                    });
+                    $request = Device::Modbus::Request->new(
+                        code           => $code,
+                        read_address   => $read_addr,
+                        read_quantity  => $read_qty,
+                        write_address  => $write_addr,
+                        write_quantity => $write_qty,
+                        bytes          => $bytes,
+                        values         => \@values
+                    );
                 }
                 else {
                     $request = Device::Modbus::Exception->new(

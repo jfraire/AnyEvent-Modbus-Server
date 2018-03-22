@@ -18,6 +18,4 @@ sub get_addr_2 {
     return 6;
 }
 
-
-
 1;
